@@ -1,0 +1,13 @@
+TODO:
+configuration screen
+x strafing
+x running
+x enemy AI
+map generation
+x more weapons
+projectile weapons
+x slide along walls
+joystick controls on windows
+secret walls?
+diagonal movement when holding two buttons
+x separate interact and fire

@@ -1,0 +1,7 @@
+module RbConfig
+  WINDOW_WIDTH  = 640
+  WINDOW_HEIGHT = 480
+  FULLSCREEN    = false
+  SUB_DIVISION  = 3
+  AI_INVOCATIONS_PER_LOOP = 2
+end

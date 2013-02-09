@@ -1,0 +1,12 @@
+You need to install the Gosu game library first:
+
+  gem install gosu
+
+Then you can start the game with:
+
+  ruby wolf3d.rb
+
+
+== Too slow?
+
+Try running it in Ruby Enterprise Edition or in Ruby 1.9.
