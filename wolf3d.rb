@@ -14,7 +14,7 @@ require './ai_player'
 require './sprite'
 require './door'
 require './image_pool'
-require './missle'
+require './missile'
 
 require './level'
 
@@ -112,7 +112,7 @@ class GameWindow < Gosu::Window
         process_movement_input
         invoke_players
         invoke_items
-        invoke_missles
+        invoke_missiles
         invoke_doors
       end
       determine_screen_flash(old_player_health)
@@ -331,8 +331,8 @@ class GameWindow < Gosu::Window
     }
   end
 
-  def invoke_missles
-    @map.missles.each do |m|
+  def invoke_missiles
+    @map.missiles.each do |m|
       m.interact(@player)
     end
   end

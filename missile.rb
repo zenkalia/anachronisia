@@ -2,7 +2,7 @@ require './map'
 require './sprite'
 require './sound'
 
-class Missle
+class Missile
   include Sprite
   include Directable
   attr_accessor :angle
@@ -17,8 +17,8 @@ class Missle
     @x = x
     @y = y
     @angle = 0
-    @slices = (1..8).map{|n| SpritePool::get(window, "missles/#{clean_name}/#{n}.png", TEX_HEIGHT)}
-    @dead_slices = (1..6).map{|n| SpritePool::get(window, "missles/#{clean_name}/death#{n}.png", TEX_HEIGHT)}
+    @slices = (1..8).map{|n| SpritePool::get(window, "missiles/#{clean_name}/#{n}.png", TEX_HEIGHT)}
+    @dead_slices = (1..6).map{|n| SpritePool::get(window, "missiles/#{clean_name}/death#{n}.png", TEX_HEIGHT)}
     @last_draw_time = Time.now.to_f
     @dead = false
   end
@@ -29,7 +29,7 @@ class Missle
 
   def slices
     if @dead
-      @map.missles.delete(self) if @dead == @dead_slices.count-1
+      @map.missiles.delete(self) if @dead == @dead_slices.count-1
       return @dead_slices[@dead]
     end
     pa = @window.player.angle
@@ -50,5 +50,5 @@ class Missle
   end
 end
 
-class Rocket < Missle
+class Rocket < Missile
 end
