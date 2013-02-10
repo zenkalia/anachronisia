@@ -29,9 +29,6 @@ class Generator
         y = door[1] - rand(height)
       end
 
-      require 'pry'
-      #binding.pry if direction == :top
-
       if make_rect_room(x,y,width,height)
         rooms << [x,y,width,height]
         doors << door
@@ -45,9 +42,29 @@ class Generator
         end
       end
     end
-    require 'csv'
-    CSV.open('lol.csv', 'wb') { |csv| @map.each { |r| csv << r } }
+    dump
     @map
+  end
+
+  def self.make_bsp(n = 3)
+    @map = Array.new(64) { Array.new(64, 1) }
+    a = BSP.new(0,0,63,63)
+    a.split(n)
+
+    def self.make_bsp_rooms(bsp)
+      return unless bsp
+      make_rect_room(bsp.x+2, bsp.y+2, bsp.dx-4, bsp.dy-4) unless bsp.a
+      make_bsp_rooms(bsp.a)
+      make_bsp_rooms(bsp.b)
+    end
+    make_bsp_rooms(a)
+    dump
+    @map
+  end
+
+  def self.dump(name='lol.csv')
+    require 'csv'
+    CSV.open(name, 'wb') { |csv| @map.each { |r| csv << r } }
   end
 
   def self.make_rect_room(start_x, start_y,dx,dy)
@@ -89,5 +106,48 @@ class Generator
     end
     return false if @map[y][x+1] == -1 or @map[y][x-1] == -1 or @map [y-1][x] == -1 or @map[y+1][x] == -1
     [side, [x,y]]
+  end
+end
+
+class BSP
+  attr_accessor :x
+  attr_accessor :y
+  attr_accessor :dx
+  attr_accessor :dy
+  attr_accessor :a
+  attr_accessor :b
+  attr_accessor :dad
+  attr_accessor :split_type
+  def initialize (x,y,dx,dy,dad=nil)
+    @x = x
+    @y = y
+    @dx = dx
+    @dy = dy
+    @dad = dad
+  end
+
+  def split(n=1)
+    return if n == 0 or dx <= 4 or dy <= 4
+    if @dad and @dad.split_type = :horiz
+      self.split_vert
+    else
+      self.split_horiz
+    end
+    a.split(n-1)
+    b.split(n-1)
+  end
+
+  def split_horiz
+    y = rand(@dy)
+    @a = self.class.new(@x,@y,@dx,y,self)
+    @b = self.class.new(@x,@y+y,@dx,@dy-y,self)
+    @split_type = :horiz
+  end
+
+  def split_vert
+    x = rand(@dx)
+    @a = self.class.new(@x,@y,x,@dy,self)
+    @b = self.class.new(@x+x,@y,@dx-x,@dy,self)
+    @split_type = :vert
   end
 end
