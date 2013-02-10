@@ -404,3 +404,21 @@ class Dog < Enemy
     @min_distance = 1
   end
 end
+
+class Creeper < Enemy
+  def initialize(window, map, x, y, death_sound = 'enemies/dog/dog_cry.ogg', firing_sound = 'enemies/dog/dog_bark.ogg', kill_score = 500, step_size = 7, animation_interval = 0.2)
+    sprites = {
+      :idle    => ["enemies/#{clean_name}/walking1.png"],
+      :walking => (1..4).map{|n| "enemies/#{clean_name}/walking#{n}.png"},
+      :firing  => (1..3).map{|n| "enemies/#{clean_name}/walking#{n}.png"},
+      :damaged => (1..2).map{|n| "enemies/#{clean_name}/damaged#{n}.png"},
+      :dead    => (1..4).map{|n| "enemies/#{clean_name}/dead#{n}.png"},
+    }
+
+    @name = "Creeper"
+    super(window, sprites, map, x, y, death_sound, firing_sound, kill_score, step_size, animation_interval)
+    @health = 1000
+    @melee_attack_damage = 4
+    @min_distance = 1
+  end
+end
