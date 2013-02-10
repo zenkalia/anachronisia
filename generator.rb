@@ -53,7 +53,7 @@ class Generator
 
     def self.make_bsp_rooms(bsp)
       return unless bsp
-      make_rect_room(bsp.x+2, bsp.y+2, bsp.dx-4, bsp.dy-4) unless bsp.a
+      make_rect_room(bsp.x+1, bsp.y+1, bsp.dx-2, bsp.dy-2) unless bsp.a
       make_bsp_rooms(bsp.a)
       make_bsp_rooms(bsp.b)
     end
@@ -138,16 +138,16 @@ class BSP
   end
 
   def split_horiz
-    y = rand(@dy)
+    y = rand(@dy-4)+2
     @a = self.class.new(@x,@y,@dx,y,self)
-    @b = self.class.new(@x,@y+y,@dx,@dy-y,self)
+    @b = self.class.new(@x,@y+y+1,@dx,@dy-y-2,self)
     @split_type = :horiz
   end
 
   def split_vert
-    x = rand(@dx)
+    x = rand(@dx-4)+2
     @a = self.class.new(@x,@y,x,@dy,self)
-    @b = self.class.new(@x+x,@y,@dx-x,@dy,self)
+    @b = self.class.new(@x+x+1,@y,@dx-x-2,@dy,self)
     @split_type = :vert
   end
 end
