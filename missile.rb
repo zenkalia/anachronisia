@@ -21,6 +21,7 @@ class Missile
     @dead_slices = (1..6).map{|n| SpritePool::get(window, "missiles/#{clean_name}/death#{n}.png", TEX_HEIGHT)}
     @last_draw_time = Time.now.to_f
     @dead = false
+    @damage = 40
   end
 
   def clean_name
@@ -42,6 +43,10 @@ class Missile
   end
 
   def interact(player)
+    if !@dead and (y-player.y).abs <= 60 and (x-player.x).abs <= 60
+      @dead = 0
+      player.take_damage_from(self, @damage)
+    end
     if @dead
       @dead += 1
     else
@@ -51,4 +56,8 @@ class Missile
 end
 
 class Rocket < Missile
+  def initialize(window, map, x, y)
+    super(window, map, x, y)
+    @damage = 80
+  end
 end
