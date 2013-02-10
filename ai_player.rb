@@ -211,16 +211,17 @@ class Enemy < AIPlayer
     @last_draw_time = Time.now.to_f
   end
 
-  def take_damage_from(player)
+  def take_damage_from(player, damage)
     return if @current_state == :dead
-    @health -= player.weapon.damage
+    damage = player.class == Player ? player.weapon.damage : player.damage
+    @health -= damage
     if @health > 0
       self.current_state = :damaged
     else
       self.current_state = :dead
       @firing_sound_sample.stop if @firing_sound_sample
       play_random_sound(@death_sounds)
-      player.score += @kill_score
+      @window.player.score += @kill_score
     end
   end
 

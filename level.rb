@@ -208,6 +208,7 @@ public
     map.add do |add|
       # Southern (starting) room.
       add.player(Guard, 40.5, 61.5)
+      add.missile(Rocket, 35, 61.5)
       
       # Room of horizontal scaling.
       add.player(Dog, 37.5, 52.5)

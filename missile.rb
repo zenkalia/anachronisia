@@ -50,6 +50,12 @@ class Missile
     if @dead
       @dead += 1
     else
+      @map.players.each do |p|
+        if (y-p.y).abs <= 60 and (x-p.x).abs <= 60
+          @dead = 0
+          p.take_damage_from(self, @damage)
+        end
+      end
       @dead = 0 unless move_exact(dx,dy, @map)
     end
   end
