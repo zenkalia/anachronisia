@@ -1,12 +1,12 @@
 class Generator
   def self.make_map
     @map = Array.new(64) { Array.new(64, 1) }
-    rooms = []
-    doors = []
-    rooms << [32,32,4,4] if make_rect_room(32,32,4,4)
+    @rooms = []
+    @doors = []
+    @rooms << [32,32,4,4] if make_rect_room(32,32,4,4)
 
     5000.times do
-      add_to_room = rooms.sample
+      add_to_room = @rooms.sample
       height = rand(10)+3
       width = rand(10)+3
       t = door_for(add_to_room)
@@ -30,34 +30,44 @@ class Generator
       end
 
       if make_rect_room(x,y,width,height)
-        rooms << [x,y,width,height]
-        doors << door
+        @rooms << [x,y,width,height]
+        @doors << door
         @map[door[1]][door[0]] = -1
-        if @map[door[1]-1][door[0]] == 1 and @map[door[1]+1][door[0]] == 1
-          @map[door[1]-1][door[0]] = 2
-          @map[door[1]+1][door[0]] = 2
-        else
-          @map[door[1]][door[0]-1] = 3
-          @map[door[1]][door[0]+1] = 3
-        end
       end
     end
+    decorate_doors
     dump
     @map
   end
 
-  def self.make_bsp(n = 3)
+  def self.decorate_doors
+    @doors.each do |d|
+      if @map[d[1]-1][d[0]] == 1 and @map[d[1]+1][d[0]] == 1
+        @map[d[1]-1][d[0]] = 2
+        @map[d[1]+1][d[0]] = 2
+      else
+        @map[d[1]][d[0]-1] = 3
+        @map[d[1]][d[0]+1] = 3
+      end
+    end
+  end
+
+  def self.make_bsp(n = 7)
     @map = Array.new(64) { Array.new(64, 1) }
     a = BSP.new(0,0,63,63)
+    @rooms = []
     a.split(n)
 
     def self.make_bsp_rooms(bsp)
       return unless bsp
-      make_rect_room(bsp.x+1, bsp.y+1, bsp.dx-2, bsp.dy-2) unless bsp.a
+      unless bsp.a
+        @rooms << [bsp.x+1, bsp.y+1, bsp.dx-1, bsp.dy-2] if make_rect_room(bsp.x+1, bsp.y+1, bsp.dx-2, bsp.dy-2)
+      end
       make_bsp_rooms(bsp.a)
       make_bsp_rooms(bsp.b)
     end
     make_bsp_rooms(a)
+
     dump
     @map
   end
@@ -128,7 +138,7 @@ class BSP
 
   def split(n=1)
     return if n == 0 or dx <= 4 or dy <= 4
-    if @dad and @dad.split_type = :horiz
+    if @dad and @dad.split_type == :horiz
       self.split_vert
     else
       self.split_horiz
