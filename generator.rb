@@ -54,24 +54,38 @@ class Generator
 
   def self.make_bsp(n = 7)
     @map = Array.new(64) { Array.new(64, 1) }
-    a = BSP.new(0,0,63,63)
+    bsp = BSP.new(0,0,63,63)
     @rooms = []
-    a.split(n)
+    bsp.split(n)
 
-    def self.make_bsp_rooms(bsp)
-      return unless bsp
-      unless bsp.a
-        @rooms << [bsp.x+1, bsp.y+1, bsp.dx-1, bsp.dy-2] if make_rect_room(bsp.x+1, bsp.y+1, bsp.dx-2, bsp.dy-2)
-      end
-      make_bsp_rooms(bsp.a)
-      make_bsp_rooms(bsp.b)
-    end
-    make_bsp_rooms(a)
+    make_bsp_rooms(bsp)
+    make_bsp_doors(bsp)
 
     dump
     @map
   end
 
+  def self.make_bsp_rooms(bsp)
+    return unless bsp
+    unless bsp.a
+      @rooms << [bsp.x+1, bsp.y+1, bsp.dx-1, bsp.dy-2] if make_rect_room(bsp.x+1, bsp.y+1, bsp.dx-2, bsp.dy-2)
+    end
+    make_bsp_rooms(bsp.a)
+    make_bsp_rooms(bsp.b)
+  end
+
+  def self.make_bsp_doors(bsp)
+    return if !bsp or !bsp.a
+
+    make_bsp_doors(bsp.a)
+    make_bsp_doors(bsp.b)
+
+    if bsp.split_type == :horiz
+      bot_door = [bsp.a.x+1+rand(bsp.a.dx), bsp.a.y+bsp.a.dy+1]
+      top_door = [bsp.b.x+1+rand(bsp.b.dx), bsp.b.y+1]
+      #connect them!
+    end
+  end
   def self.dump(name='lol.csv')
     require 'csv'
     CSV.open(name, 'wb') { |csv| @map.each { |r| csv << r } }
