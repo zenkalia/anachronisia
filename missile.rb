@@ -8,6 +8,7 @@ class Missile
   attr_accessor :angle
   attr_accessor :damage
   attr_accessor :speed
+  attr_accessor :owner
   TEX_WIDTH  = 64
   TEX_HEIGHT = 64
 
@@ -22,6 +23,7 @@ class Missile
     @last_draw_time = Time.now.to_f
     @dead = false
     @damage = 40
+    @owner = nil
   end
 
   def clean_name
@@ -43,7 +45,7 @@ class Missile
   end
 
   def interact(player)
-    if !@dead and (y-player.y).abs <= 60 and (x-player.x).abs <= 60
+    if !@dead and (y-player.y).abs <= 60 and (x-player.x).abs <= 60 and @owner != player
       @dead = 0
       player.take_damage_from(self, @damage)
     end
@@ -51,7 +53,7 @@ class Missile
       @dead += 1
     else
       @map.players.each do |p|
-        if (y-p.y).abs <= 60 and (x-p.x).abs <= 60
+        if (y-p.y).abs <= 60 and (x-p.x).abs <= 60 and @owner != p
           @dead = 0
           p.take_damage_from(self, @damage)
         end
@@ -62,8 +64,9 @@ class Missile
 end
 
 class Rocket < Missile
-  def initialize(window, map, x, y)
+  def initialize(window, map, x, y, owner = nil)
     super(window, map, x, y)
     @damage = 80
+    @owner = owner
   end
 end

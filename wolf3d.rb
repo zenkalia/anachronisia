@@ -383,6 +383,14 @@ class GameWindow < Gosu::Window
       #@player.crouching = :up if @player.crouching == true
     #end
 
+    if button_down? Gosu::Kb8
+      @map.add do |add|
+        r = add.missile(Rocket, @player.x / Map::GRID_WIDTH_HEIGHT, @player.y / Map::GRID_WIDTH_HEIGHT)
+        r.angle = @player.angle
+        r.owner = @player
+      end
+    end
+
     if button_down? Gosu::KbSpace or button_down? @controls::B
       column, row = Map.matrixify(@player.x, @player.y)
       door = @map.get_door(row, column, @player.angle)
