@@ -403,7 +403,7 @@ class GameWindow < Gosu::Window
       sprite_in_crosshair = @drawn_sprite_x[RbConfig::WINDOW_WIDTH/2]
 
       if sprite_in_crosshair && sprite_in_crosshair.respond_to?(:take_damage_from) && sprite_in_crosshair.respond_to?(:dead?) && !sprite_in_crosshair.dead?
-        sprite_in_crosshair.take_damage_from(@player)
+        sprite_in_crosshair.take_damage_from(@player, @player.weapon.damage)
       end
 
       @fired_weapon = true
