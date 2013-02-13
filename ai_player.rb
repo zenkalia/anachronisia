@@ -411,7 +411,7 @@ class Creeper < Enemy
     sprites = {
       :idle    => ["enemies/#{clean_name}/walking1.png"],
       :walking => (1..4).map{|n| "enemies/#{clean_name}/walking#{n}.png"},
-      :firing  => (1..3).map{|n| "enemies/#{clean_name}/walking#{n}.png"},
+      :exploding => (1..5).map{|n| "enemies/#{clean_name}/exploding#{n}.png"},
       :damaged => (1..2).map{|n| "enemies/#{clean_name}/damaged#{n}.png"},
       :dead    => (1..4).map{|n| "enemies/#{clean_name}/dead#{n}.png"},
     }
@@ -421,5 +421,20 @@ class Creeper < Enemy
     @health = 1000
     @melee_attack_damage = 4
     @min_distance = 1
+  end
+
+  def interact(player)
+    if @current_state == :exploding and @current_anim_seq_id == @slices[:exploding].count-1
+      @map.players.delete(self)
+    else
+      super(player)
+    end
+  end
+
+  def fire(player, damage)
+    unless @current_state == :exploding
+      player.take_damage_from(self, damage)
+      self.current_state = :exploding
+    end
   end
 end

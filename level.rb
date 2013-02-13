@@ -199,7 +199,7 @@ public
     end
     
     map.add do |add|
-      add.missile(Rocket, 37.5, 57.5)
+      add.player(Creeper, 37.5, 57.5)
     end
 
     ####### Players #######
