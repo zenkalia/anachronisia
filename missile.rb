@@ -9,6 +9,7 @@ class Missile
   attr_accessor :damage
   attr_accessor :speed
   attr_accessor :owner
+  attr_accessor :dead
   TEX_WIDTH  = 64
   TEX_HEIGHT = 64
 
@@ -32,8 +33,8 @@ class Missile
 
   def slices
     if @dead
-      @map.missiles.delete(self) if @dead == @dead_slices.count-1
-      return @dead_slices[@dead]
+      @map.missiles.delete(self) if @dead >= @dead_slices.count-1
+      return @dead_slices[@dead] || @dead_slices.last
     end
     pa = @window.player.angle
     a = @angle
