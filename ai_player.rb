@@ -369,6 +369,26 @@ class Guard < Enemy
   end
 end
 
+class Alien < Enemy
+  def initialize(window, map, x, y, death_sound = nil, firing_sound = nil, kill_score = 100, step_size = 6, animation_interval = 0.2)
+    sprites = {
+      :idle    => ["enemies/#{clean_name}/idle.png"],
+      :walking => (1..4).map{|n| "enemies/#{clean_name}/walking#{n}.png"},
+      :firing  => (1..2).map{|n| "enemies/#{clean_name}/walking#{n}.png"},
+      :damaged => (1..2).map{|n| "enemies/#{clean_name}/walking#{n}.png"},
+      :dead    => (1..3).map{|n| "enemies/#{clean_name}/walking#{n}.png"},
+    }
+
+    sounds  = ['long live php.ogg', 'myphplife.ogg', 'my damn php life.ogg', 'phpforever.ogg'].map{|n| "enemies/guard/#{n}"}
+    firing_sound ||= sounds[rand(sounds.size - 1)]
+    death_sound  ||= sounds[rand(sounds.size - 1)]
+
+    super(window, sprites, map, x, y, death_sound, firing_sound, kill_score, step_size, animation_interval)
+    @health = 50
+    @ranged_attack_damage = 3
+  end
+end
+
 class Hans < Enemy
   def initialize(window, map, x, y, death_sound = nil, firing_sound = 'machine_gun_burst.ogg', kill_score = 1000, step_size = 3, animation_interval = 0.2)
     sprites = {
