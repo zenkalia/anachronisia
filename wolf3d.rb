@@ -386,7 +386,7 @@ class GameWindow < Gosu::Window
     if button_down? Gosu::Kb8
       @map.add do |add|
         r = add.missile(Rocket, @player.x / Map::GRID_WIDTH_HEIGHT, @player.y / Map::GRID_WIDTH_HEIGHT)
-        r.angle = @player.angle
+        r.angle = -@player.angle
         r.owner = @player
       end
     end
