@@ -32,10 +32,7 @@ class Missile
   end
 
   def slices
-    if @dead
-      @map.missiles.delete(self) if @dead >= @dead_slices.count-1
-      return @dead_slices[@dead] || @dead_slices.last
-    end
+    return @dead_slices[@dead] || @dead_slices.last if @dead
     pa = @window.player.angle
     a = @angle
     @slices[((a+180+pa+22.5)%360/45).to_i]
@@ -52,6 +49,7 @@ class Missile
     end
     if @dead
       @dead += 1
+      @map.missiles.delete(self) if @dead >= @dead_slices.count
     else
       @map.players.each do |p|
         if (y-p.y).abs <= 60 and (x-p.x).abs <= 60 and @owner != p
