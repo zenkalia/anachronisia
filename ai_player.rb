@@ -124,7 +124,6 @@ class AIPlayer
 
     start = Coordinate.new(*Map.matrixify(@x, @y))
     goal  = Coordinate.new(*Map.matrixify(player.x, player.y))
-    los = line_of_sight(@map,start,goal)
 
     melee = @melee_attack_damage ? melee_attack(player, start, goal) : nil
     ranged_attack(player, start, goal) if @ranged_attack_damage and !melee
@@ -456,5 +455,16 @@ class Creeper < Enemy
       player.take_damage_from(self, damage)
       self.current_state = :exploding
     end
+  end
+  def melee_attack(player, start, goal)
+    if @firing_left > 0
+      self.fire(player, @melee_attack_damage)
+      return true
+    end
+    h = heuristic_estimate_of_distance(start, goal)
+    if h <= @min_distance and line_of_sight(@map,start,goal) and rand > 0.5
+      @firing_left = 1 + rand(5)
+    end
+    false
   end
 end
