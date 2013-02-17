@@ -1,5 +1,9 @@
 class Weapon
-  attr_accessor :name, :damage, :idle_sprite, :fire_sprite, :wait
+  attr_accessor :name
+  attr_accessor :damage
+  attr_accessor :idle_sprite
+  attr_accessor :fire_sprite
+  attr_accessor :wait
 
   def initialize(window)
     @wait = 0
