@@ -114,6 +114,7 @@ class GameWindow < Gosu::Window
         invoke_items
         invoke_missiles
         invoke_doors
+        invoke_weapon
       end
       determine_screen_flash(old_player_health)
 
@@ -285,6 +286,10 @@ class GameWindow < Gosu::Window
     end
   end
 
+  def invoke_weapon
+    @player.weapon.wait -= 1 if @player.weapon.wait > 0
+  end
+
   # Invoke AI players' AI. Maximum of AI_INVOCATIONS_PER_LOOP AI invocations per call.
   def invoke_players
     if @ai_schedule_index > @map.players.size - 1
@@ -407,7 +412,7 @@ class GameWindow < Gosu::Window
       end
     end
 
-    if button_down? Gosu::KbD or button_down? @controls::X
+    if button_down? Gosu::KbD or button_down? @controls::X and @player.weapon.can_fire?
       sprite_in_crosshair = @drawn_sprite_x[RbConfig::WINDOW_WIDTH/2]
 
       if sprite_in_crosshair && sprite_in_crosshair.respond_to?(:take_damage_from) && sprite_in_crosshair.respond_to?(:dead?) && !sprite_in_crosshair.dead?
@@ -415,6 +420,7 @@ class GameWindow < Gosu::Window
       end
 
       @fired_weapon = true
+      @player.weapon.fire
     else
       @fired_weapon = false
     end
@@ -530,28 +536,10 @@ class GameWindow < Gosu::Window
   end
 
   def draw_hud
-    @hud.draw(0, 405, ZOrder::HUD)
-    if @player.health_percent <= 85 && @player.health_percent > 70
-      portret_id = 1
-    elsif @player.health_percent <= 70 && @player.health_percent > 55
-      portret_id = 2
-    elsif @player.health_percent <= 55 && @player.health_percent > 40
-      portret_id = 3
-    elsif @player.health_percent <= 40 && @player.health_percent > 25
-      portret_id = 4
-    elsif @player.health_percent <= 25 && @player.health_percent > 10
-      portret_id = 5
-    elsif @player.health_percent <= 10
-      portret_id = 6
-    else
-      portret_id = 0
-    end
-
-    @hud_portret[portret_id].draw(268, 414, ZOrder::HUD)
     # Health
-    draw_number(@player.health, 375)
+    draw_number(@player.health, 600, 400)
     # Score
-    draw_number(@player.score, 178)
+    draw_number(@player.score, 600, 350)
   end
 
   def draw_number(number, x, y = 435)
@@ -578,10 +566,10 @@ class GameWindow < Gosu::Window
     end
 
     if @fired_weapon
-      @player.weapon.fire_sprite.draw(200, 240 + dy, ZOrder::WEAPON)
+      @player.weapon.fire_sprite.draw(200, 244 + dy, ZOrder::WEAPON)
       @fire_sound.play(0.2)
     else
-      @player.weapon.idle_sprite.draw(200, 276 + dy, ZOrder::WEAPON)
+      @player.weapon.idle_sprite.draw(200, 280 + dy, ZOrder::WEAPON)
     end
   end
 
