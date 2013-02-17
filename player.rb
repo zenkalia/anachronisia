@@ -23,6 +23,8 @@ class Player
   attr_accessor :crouching
   attr_accessor :jumping
   attr_accessor :weapon
+  attr_accessor :items
+  attr_accessor :current_item
 
   def initialize(window)
     @x = 0.0
@@ -36,7 +38,24 @@ class Player
     @crouched = false
     @jumping = false
     @height = 0.5
-    @weapon = PowerOfCode.new(window)
+    @current_item = 0
+    @items = Array.new(10,nil)
+    @items[0] = PowerOfCode.new(window)
+    @items[1] = Pistol.new(window)
+  end
+
+  def weapon
+    @items[@current_item]
+  end
+
+  def next_item
+    @current_item += 1
+    @current_item = 0 if @current_item == 10
+  end
+
+  def prev_item
+    @current_item -= 1
+    @current_item = -1 if @current_item == 9
   end
 
   def update
@@ -62,6 +81,10 @@ class Player
       end
     end
 
+  end
+
+  def get_item(item)
+    @items[@items.index(nil)] = item
   end
 
   def angle_speed

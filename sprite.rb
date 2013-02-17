@@ -294,10 +294,14 @@ class Rails < Powerup
   end
 end
 
-class PHP < Powerup
+class PHP < Item
   def initialize(window, map, x, y)
-    super(window, map, x, y, SpritePool::get(window, 'php.png', TEX_HEIGHT), -25,
-          'PHP: "Fuck you!"', 'fuck_you.ogg')
+    super(window, map, x, y, SpritePool::get(window, 'php.png', TEX_HEIGHT))
+  end
+  private
+  def execute_interaction_effect(player)
+    super(player)
+    player.get_item(self)
   end
 end
 

@@ -287,6 +287,7 @@ class GameWindow < Gosu::Window
   end
 
   def invoke_weapon
+    return unless @player.weapon.kind_of? Weapon
     @player.weapon.wait -= 1 if @player.weapon.wait > 0
   end
 
@@ -376,8 +377,6 @@ class GameWindow < Gosu::Window
     @player.move_backward(@map) if button_down? Gosu::KbK or button_down? @controls::DOWN
     @player.move_left(@map) if button_down? Gosu::KbU or button_down? @controls::L
     @player.move_right(@map) if button_down? Gosu::KbO or button_down? @controls::R
-    @player.weapon = PowerOfCode.new(self) if button_down? Gosu::Kb1 or button_down? @controls::SELECT
-    @player.weapon = Pistol.new(self) if button_down? Gosu::Kb2 or button_down? @controls::START
 
     #if (button_down? Gosu::KbC or button_down? Gosu::GpButton14) and @player.jumping == false
       #@player.jumping = :up
@@ -427,6 +426,8 @@ class GameWindow < Gosu::Window
   end
 
   def button_down(id)
+    @player.prev_item if id ==  Gosu::Kb1 or id == @controls::SELECT
+    @player.next_item if id == Gosu::Kb2 or id == @controls::START
     if id == Gosu::KbEscape
       @bg_song.stop if @bg_song
       close
@@ -557,6 +558,7 @@ class GameWindow < Gosu::Window
   end
 
   def draw_weapon
+    return unless @player.weapon
     if button_down? Gosu::KbUp
       dy = Math.cos(Time.now.to_f * -10) * 7
     elsif button_down? Gosu::KbDown
