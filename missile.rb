@@ -68,4 +68,7 @@ class Rocket < Missile
     @damage = 80
     @owner = owner
   end
+  def step_size
+    15
+  end
 end

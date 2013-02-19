@@ -56,6 +56,7 @@ class GameWindow < Gosu::Window
   BOTTOM = RbConfig::WINDOW_HEIGHT - 1
 
   attr_accessor :player
+  attr_accessor :map
 
   def initialize
     super(RbConfig::WINDOW_WIDTH, RbConfig::WINDOW_HEIGHT, RbConfig::FULLSCREEN)

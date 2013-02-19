@@ -7,6 +7,7 @@ class Weapon
 
   def initialize(window)
     @wait = 0
+    @window = window
   end
 
   def can_fire?
@@ -35,9 +36,18 @@ class Pistol < Weapon
     super
     @name = 'COD4'
     @internal_name = 'gun'
-    @damage = 10
+    @damage = 0
     @idle_sprite = Gosu::Image::new(window, "weapons/#{@internal_name}/idle.png", true)
     @fire_sprite = Gosu::Image::new(window, "weapons/#{@internal_name}/firing.png", true)
     @cooldown = 3
+  end
+
+  def fire
+    super
+    @window.map.add do |add|
+      r = add.missile(Rocket, @window.player.x / Map::GRID_WIDTH_HEIGHT, @window.player.y / Map::GRID_WIDTH_HEIGHT)
+      r.angle = -@window.player.angle
+      r.owner = @window.player
+    end
   end
 end
