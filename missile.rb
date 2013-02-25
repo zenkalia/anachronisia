@@ -52,6 +52,7 @@ class Missile
       @map.missiles.delete(self) if @dead >= @dead_slices.count
     else
       @map.players.each do |p|
+        next if p.current_state == :dead
         if (y-p.y).abs <= 60 and (x-p.x).abs <= 60 and @owner != p
           @dead = 0
           p.take_damage_from(self, @damage)
