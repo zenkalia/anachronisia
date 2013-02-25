@@ -468,3 +468,22 @@ class Creeper < Enemy
     false
   end
 end
+
+class Bulbasaur < Enemy
+  def initialize(window, map, x, y, death_sound = nil, firing_sound = nil, kill_score = 100, step_size = 3, animation_interval = 0.2)
+    sprites = {
+      :idle    => ["enemies/#{clean_name}/idle.png"],
+      :walking => (1..4).map{|n| "enemies/#{clean_name}/walking#{n}.png"},
+      :firing  => (1..2).map{|n| "enemies/#{clean_name}/firing#{n}.png"},
+      :damaged => (1..2).map{|n| "enemies/#{clean_name}/damaged#{n}.png"},
+      :dead    => (1..4).map{|n| "enemies/#{clean_name}/dead#{n}.png"},
+    }
+
+    firing_sound ||= 'enemies/bulbasaur/guardshot.ogg'
+    death_sound  ||= 'enemies/bulbasaur/phpforever.ogg'
+
+    super(window, sprites, map, x, y, death_sound, firing_sound, kill_score, step_size, animation_interval)
+    @health = 50
+    @ranged_attack_damage = 3
+  end
+end
