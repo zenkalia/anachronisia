@@ -58,8 +58,8 @@ class GameWindow < Gosu::Window
   attr_accessor :player
   attr_accessor :map
 
-  def initialize
-    super(RbConfig::WINDOW_WIDTH, RbConfig::WINDOW_HEIGHT, RbConfig::FULLSCREEN)
+  def initialize(config = {})
+    super(RbConfig::WINDOW_WIDTH, RbConfig::WINDOW_HEIGHT, config[:fullscreen])
     self.caption = 'Rubystein 3d by Phusion CS Company'
 
     @controls = Gamepad::Win
@@ -726,8 +726,44 @@ class GameWindow < Gosu::Window
 
 end
 
+class ConfigWindow < Gosu::Window
+  def initialize
+    super(300, 200, false)
+  end
+  def update
+    if button_down? Gosu::KbF
+      @fullscreen = true
+      close
+    end
+    if button_down? Gosu::KbW
+      @fullscreen = false
+      close
+    end
+    close if button_down? Gosu::KbEscape
+  end
+
+  def draw
+   # draw_quad(0,0,Gosu::Color::WHITE, 300,0,Gosu::Color::WHITE, 300,200,Gosu::Color::WHITE,0,200,Gosu::Color::WHITE)
+    hud = Gosu::Image::new(self, 'hud.png', true)
+    f = Gosu::Image.from_text(self, '[F]ullscreen', Gosu::default_font_name, 22, 4, 150, :center)
+    w = Gosu::Image.from_text(self, '[W]indowed', Gosu::default_font_name, 22, 4, 150, :center)
+    f.draw(0, 100, 0)
+    w.draw(150,100, 0)
+  end
+
+  def fullscreen?
+    @fullscreen
+  end
+end
+
 Dir.chdir 'assets'
-game_window = GameWindow.new
+
+config_window = ConfigWindow.new
+config_window.show
+
+exit if config_window.fullscreen? == nil
+
+game_window = GameWindow.new(fullscreen: config_window.fullscreen?)
 if ARGV[0] == '--profile'
   require 'ruby-prof'
   result = RubyProf.profile do
