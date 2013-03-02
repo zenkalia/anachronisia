@@ -482,8 +482,18 @@ class Bulbasaur < Enemy
     firing_sound ||= 'enemies/bulbasaur/guardshot.ogg'
     death_sound  ||= 'enemies/bulbasaur/phpforever.ogg'
 
+    Leaf.new(window, 0, 0, 0)
+
     super(window, sprites, map, x, y, death_sound, firing_sound, kill_score, step_size, animation_interval)
     @health = 50
     @ranged_attack_damage = 3
+  end
+  def fire(player, damage)
+    @window.map.add do |add|
+      r = add.missile(Leaf, @x / Map::GRID_WIDTH_HEIGHT, @y / Map::GRID_WIDTH_HEIGHT)
+      a = Math::atan2(@y - @window.player.y, @x - @window.player.x) / Math::PI * 180
+      r.angle = ((a+180)%360)
+      r.owner = self
+    end
   end
 end

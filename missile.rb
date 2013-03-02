@@ -20,7 +20,6 @@ class Missile
     @y = y
     @angle = 0
     @slices = (1..8).map{|n| SpritePool::get(window, "missiles/#{clean_name}/#{n}.png", TEX_HEIGHT)}
-    @dead_slices = (1..6).map{|n| SpritePool::get(window, "missiles/#{clean_name}/death#{n}.png", TEX_HEIGHT)}
     @last_draw_time = Time.now.to_f
     @dead = false
     @damage = 40
@@ -68,8 +67,21 @@ class Rocket < Missile
     super(window, map, x, y)
     @damage = 80
     @owner = owner
+    @dead_slices = (1..6).map{|n| SpritePool::get(window, "missiles/#{clean_name}/death#{n}.png", TEX_HEIGHT)}
   end
   def step_size
     15
+  end
+end
+
+class Leaf < Missile
+  def initialize(window, map, x, y, owner = nil)
+    super(window, map, x, y)
+    @damage = 8
+    @owner = owner
+    @dead_slices = [SpritePool::get(window, "missiles/#{clean_name}/death1.png", TEX_HEIGHT)]
+  end
+  def step_size
+   20
   end
 end
