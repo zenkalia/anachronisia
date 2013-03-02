@@ -127,8 +127,6 @@ class GameWindow < Gosu::Window
       end
 
       @player.update
-    when :presenting_boss
-      update_boss_presentation_progress
     else
       abort "Invalid mode '#{@mode}'"
     end
@@ -144,9 +142,6 @@ class GameWindow < Gosu::Window
       draw_screen_flash
       draw_text
       draw_fade_out_overlay
-
-    when :presenting_boss
-      draw_boss_presentation
 
     else
       abort "Invalid mode '#{@mode}'"
@@ -169,44 +164,6 @@ class GameWindow < Gosu::Window
       :alpha      => 0,
       :when_done  => when_done
     }
-  end
-
-  def present_boss(name, avatar_filename, title = "Boss", duration = 1, &block)
-    begin
-      title_image = Gosu::Image.from_text(self, title,
-                                            BOSS_PRESENTATION_TITLE_FONT,
-                                            BOSS_PRESENTATION_TITLE_FONT_SIZE)
-    rescue
-      title_image = Gosu::Image.from_text(self, title,
-                                            Gosu::default_font_name,
-                                            BOSS_PRESENTATION_TITLE_FONT_SIZE)
-    end
-
-    begin
-      name_width = Gosu::Image.from_text(self, name, BOSS_PRESENTATION_FONT,
-                                           BOSS_PRESENTATION_FONT_SIZE).width
-    rescue
-      name_width = Gosu::Image.from_text(self, name, Gosu::default_font_name,
-                                           BOSS_PRESENTATION_FONT_SIZE).width
-    end
-
-    fade_out do
-      @bg_song.stop
-      @mode = :presenting_boss
-      @presenting_boss = {
-        :name => name,
-        :duration => duration,
-        :sound => SoundPool.get(self, 'megaman_game_start.ogg').play,
-        :avatar => Gosu::Image.new(self, avatar_filename, false),
-        :title_image => title_image,
-        :name_width => name_width,
-        :stars => Gosu::Image.new(self, 'stars.png', false),
-        :state => :opening,
-        :start_time => Time.now,
-        :when_done => block
-      }
-      update_boss_presentation_progress
-    end
   end
 
   private
@@ -233,57 +190,6 @@ class GameWindow < Gosu::Window
         @fade_out = nil
         when_done.call
       end
-    end
-  end
-
-  def update_boss_presentation_progress
-    args = @presenting_boss
-
-    if button_down?(Gosu::KbSpace)
-      args[:state] = :done
-      args[:start_time] = Time.now
-      args[:duration] = 0
-      args[:stars_start_time] = Time.now
-    end
-
-    case args[:state]
-    when :opening
-      animation_duration = 0.7
-      max_background_size = 100
-      args[:background_size] = ((Time.now - args[:start_time]) / animation_duration) * max_background_size
-      if args[:background_size] >= max_background_size
-        args[:state] = :presenting
-        args[:start_time] = Time.now
-        args[:chars] = 0
-        args[:stars_start_time] = Time.now
-      end
-
-    when :presenting
-      chars_per_second = 6
-      args[:chars] = ((Time.now - args[:start_time]) * chars_per_second).to_i
-      if args[:chars] > args[:name].size
-        args[:chars] = args[:name].size 
-        args[:state] = :waiting_until_done
-      end
-
-    when :waiting_until_done
-      if !args[:sound].playing?
-        args[:state] = :done
-        args[:start_time] = Time.now
-      end
-
-    when :done
-      if Time.now - args[:start_time] > args[:duration]
-        args[:sound].stop if args[:sound]
-        @presenting_boss = nil
-        @bg_song.play(true)
-        @mode = :normal
-        args[:when_done].call if args[:when_done]
-      end
-    end
-
-    if args[:state] != :opening
-      args[:stars_pos] = ((Time.now - args[:stars_start_time]) * -200) % args[:stars].width
     end
   end
 
@@ -641,89 +547,6 @@ class GameWindow < Gosu::Window
                 ZOrder::FADE_OUT_OVERLAY)
     end
   end
-
-  def draw_boss_presentation
-    if @presenting_boss
-      args = @presenting_boss
-
-      top = (BOTTOM - TOP) / 2 - args[:background_size] / 2
-      bottom = top + args[:background_size]
-
-      draw_quad(LEFT, top - 50, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                RIGHT, top - 50, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                RIGHT, top - 48, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                LEFT, top - 48, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                1)
-      draw_quad(LEFT, top - 25, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                RIGHT, top - 25, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                RIGHT, top - 23, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                LEFT, top - 23, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                1)
-      draw_quad(LEFT, top - 15, BOSS_PRESENTATION_CYAN_LINE_COLOR,
-                RIGHT, top - 15, BOSS_PRESENTATION_CYAN_LINE_COLOR,
-                RIGHT, top - 10, BOSS_PRESENTATION_CYAN_LINE_COLOR,
-                LEFT, top - 10, BOSS_PRESENTATION_CYAN_LINE_COLOR,
-                1)
-      draw_quad(LEFT, top - 7, BOSS_PRESENTATION_BACKGROUND_COLOR,
-                RIGHT, top - 7, BOSS_PRESENTATION_BACKGROUND_COLOR,
-                RIGHT, top - 4, BOSS_PRESENTATION_BACKGROUND_COLOR,
-                LEFT, top - 4, BOSS_PRESENTATION_BACKGROUND_COLOR,
-                1)
-      draw_quad(LEFT, top, BOSS_PRESENTATION_BACKGROUND_COLOR,
-                RIGHT, top, BOSS_PRESENTATION_BACKGROUND_COLOR,
-                RIGHT, bottom, BOSS_PRESENTATION_BACKGROUND_COLOR,
-                LEFT, bottom, BOSS_PRESENTATION_BACKGROUND_COLOR,
-                1)
-      draw_quad(LEFT, bottom + 50, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                RIGHT, bottom + 50, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                RIGHT, bottom + 48, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                LEFT, bottom + 48, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                1)
-      draw_quad(LEFT, bottom + 25, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                RIGHT, bottom + 25, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                RIGHT, bottom + 23, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                LEFT, bottom + 23, BOSS_PRESENTATION_WHITE_LINE_COLOR,
-                1)
-      draw_quad(LEFT, bottom + 15, BOSS_PRESENTATION_CYAN_LINE_COLOR,
-                RIGHT, bottom + 15, BOSS_PRESENTATION_CYAN_LINE_COLOR,
-                RIGHT, bottom + 10, BOSS_PRESENTATION_CYAN_LINE_COLOR,
-                LEFT, bottom + 10, BOSS_PRESENTATION_CYAN_LINE_COLOR,
-                1)
-      draw_quad(LEFT, bottom + 7, BOSS_PRESENTATION_BACKGROUND_COLOR,
-                RIGHT, bottom + 7, BOSS_PRESENTATION_BACKGROUND_COLOR,
-                RIGHT, bottom + 4, BOSS_PRESENTATION_BACKGROUND_COLOR,
-                LEFT, bottom + 4, BOSS_PRESENTATION_BACKGROUND_COLOR,
-                1)
-
-      if args[:state] == :presenting || args[:state] == :waiting_until_done || args[:state] == :done
-        args[:stars].draw(args[:stars_pos], 0, 2)
-        args[:stars].draw(args[:stars_pos] - args[:stars].width, 0, 2)
-        args[:stars].draw(args[:stars_pos] + args[:stars].width, 0, 2)
-        args[:stars].draw(args[:stars_pos], BOTTOM - args[:stars].height, 2)
-        args[:stars].draw(args[:stars_pos] - args[:stars].width, BOTTOM - args[:stars].height, 2)
-        args[:stars].draw(args[:stars_pos] + args[:stars].width, BOTTOM - args[:stars].height, 2)
-
-        args[:title_image].draw((RIGHT - LEFT) / 2 - args[:title_image].width / 2,
-                                top - args[:title_image].height - 80, 3)
-
-        begin
-          image = Gosu::Image.from_text(self, args[:name][0 .. args[:chars]],
-                      BOSS_PRESENTATION_FONT, BOSS_PRESENTATION_FONT_SIZE)
-        rescue
-          image = Gosu::Image.from_text(self, args[:name][0 .. args[:chars]],
-                      Gosu::default_font_name, BOSS_PRESENTATION_FONT_SIZE)
-        end
-
-        image.draw((RIGHT - LEFT) / 2 - args[:name_width] / 2, bottom + 80, 3)
-      end
-      if args[:state] == :waiting_until_done || args[:state] == :done
-        args[:avatar].draw((RIGHT - LEFT) / 2 - args[:avatar].width / 2,
-                           (BOTTOM - TOP) / 2 - args[:avatar].height / 2,
-                           2)
-      end
-    end
-  end
-
 end
 
 class ConfigWindow < Gosu::Window
